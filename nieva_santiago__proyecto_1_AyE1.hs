@@ -1,7 +1,7 @@
 {-
     Nombre:   Santiago Emanuel
     Apellido: NIEVA
-    D.N.I:    44284673
+    
 -}
 
 -- PROYECTO 1
