@@ -601,4 +601,92 @@ la lista cuyos elementos son iguales a ese valor. Por ejemplo:
     b) Programa nuevamente la función utilizando takeWhile.
 -}
 
+{-
+Analisis:
+    - Sabemos por el ejemplo 3 que el caso base sera primIguales _ [] = []
+    - Tambien deberemos buscar el valor "a" en xs, pero si "a" no es el primer elemento entonces se devuelve la lista vacia
+      por lo cual debemos analizar por casos
+-}
+-- a)
+primIgualesA ::(Eq a) => a -> [a] -> [a]
+primIgualesA _ [] = []
+primIgualesA v (x:xs) | v /= x = primIgualesA v []
+                      | otherwise = x:primIgualesA v xs
+{-
+Ejecucion:
+ghci> primIgualesA 4 [4,4,4,4,6,7,8]    Output: [4,4,4,4]
+ghci> primIgualesA 'b' "bbbbaaaeee"     Output: "bbbb"
+ghci> primIgualesA 4 [4,4,4,4,6,7,8]    Output: [4,4,4,4]
+ghci> primIgualesA 'b' "bbbbaaaeee"     Output: "bbbb"
+ghci> primIgualesA 'b' "aaaeee"         Output: ""
+-}
+
+-- b) 
+predicadoPrimIgualesA' :: Eq a => a -> a -> Bool
+predicadoPrimIgualesA' a b = a == b 
+
+primIgualesA' :: (Eq a) => a -> [a] -> [a]
+primIgualesA' v xs = takeWhile (predicadoPrimIgualesA' v) xs
+{-
+Ejecucion:
+ghci> primIgualesA' 3 [3,3,4,1]     Output: [3,3]
+ghci> primIgualesA' 2 [3,3,4,1]     Output: []
+ghci> primIgualesA' 2 []            Output: []
+-}
+---------------------------------------------------------------------------------------------
+{-
+Ejercicio 11:
+La función primIguales toma una lista y devuelve el mayor tramo inicial de la lista cuyos
+elementos son todos iguales entre sí. Por ejemplo:
+
+                            primIguales [3,3,4,1] = [3,3]
+                            primIguales [4,3,3,4,1] = [4]
+                            primIguales [] = []
+                            primIguales "aaadaa" = "aaa"
+
+        a) Programa primIguales por recursión.
+        b) Usa cualquier versión de primIgualesA para programar primIguales. Está permitido dividir en casos, pero no usar recursión.
+-}
+
+{-
+Analisis:
+    El requerimiento es bastante similar a [primIgualesA] solo que en este caso nuestro parametro [v] es igual a [head xs] 
+
+Ejemplo:
+    primIguales "aab"
+    1) {(x:xs) := "a":"ab" , x := "a" , xs:="ab" ,head xs := "a"}   => guarda (2)
+        "a":primIguales "ab"
+        2){(x:xs) := "a":"b" , x := "a" , xs:="b" ,head xs := "b"}  => guarda (3)
+            "a":"a":primIguales []
+            3){xs := []}                                            => caso base (1)
+                "a":"a":[]
+        OUTPUT: "aa"
+-}
+-- a)
+
+primIguales::(Eq a) => [a] -> [a]
+primIguales [] = []                                     --(1)
+primIguales (x:xs)  | (head xs == x) = x:primIguales xs --(2)
+                    | otherwise = x:primIguales[]       --(3)
+
+{-
+Ejecucion:
+ghci> primIguales [3,3,4,1]         Output: [3,3]
+ghci> primIguales [4,3,3,4,1]       Output: [4]
+ghci> primIguales []                Output: []
+ghci> primIguales "aaada"           Output: "aaa"
+ghci> primIguales "baaabbbbba"      Output: "b"
+-}
+-------------------------------------------------------------------------------------------------
+-- b)
+primIguales'::(Eq a) => [a] -> [a]
+primIguales' xs = primIgualesA' (head xs) xs
+{-
+Ejecucion:
+ghci> primIguales' "aaauto"                 Output: "aaa" 
+ghci> primIguales' [[1],[1],[1],[1,2]]      Output: [[1],[1],[1]]
+-}
+
+------------------------------------------------------------------------------------------------
+
 
