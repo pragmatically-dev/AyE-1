@@ -1,5 +1,4 @@
 import GHC.Float (float2Int)
-import GHC.IO.Device (IODevice(dup))
 
 {-
     Nombre:   Santiago Emanuel
