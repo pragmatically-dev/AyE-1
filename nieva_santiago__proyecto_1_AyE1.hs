@@ -688,4 +688,32 @@ ghci> primIguales' [[1],[1],[1],[1,2]]      Output: [[1],[1],[1]]
 
 ------------------------------------------------------------------------------------------------
 
+-- 12)
+--sumatoria' (x:xs) predicado = predicado x + sumatoria' xs predicado
+cuantGen :: (b -> b -> b) -> b -> [a] -> (a -> b) -> b
+cuantGen _ z [] _ = z 
+cuantGen op z (x:xs) t = t x `op` cuantGen op z xs t
+{-
+Ejecucion:
+ghci> cuantGen (&&) True [0,0,0,0] esCero       Output: True
+ghci> cuantGen (&&) True [0,0,0,0] esCero       Output: True
+ghci> cuantGen (&&) True [0,0,0,1] esCero       Output: False
+ghci> cuantGen (*) 1 [3,2,2] factorial          Output: 24
+ghci> cuantGen (*) 1 [3,2,2] id                 Output: 12
+ghci> cuantGen (+) 0 [3,2,2] factorial          Output: 10
+-}
+
+-- paraTodo'
+
+
+paraTodo''' :: [a] -> (a -> Bool) -> Bool
+paraTodo''' xs t = cuantGen (&&) True xs t
+x_igual_1 x = x==1
+{-
+Ejecucion:
+ghci> paraTodo''' [1,1,1,1,1] x_igual_1     Output: True  
+ghci> paraTodo''' [1,1,1,1,3] x_igual_1     Output: False 
+-}
+
+
 
