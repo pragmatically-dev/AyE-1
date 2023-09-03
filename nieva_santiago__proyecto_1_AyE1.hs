@@ -689,7 +689,7 @@ ghci> primIguales' [[1],[1],[1],[1,2]]      Output: [[1],[1],[1]]
 ------------------------------------------------------------------------------------------------
 
 -- 12)
---sumatoria' (x:xs) predicado = predicado x + sumatoria' xs predicado
+
 cuantGen :: (b -> b -> b) -> b -> [a] -> (a -> b) -> b
 cuantGen _ z [] _ = z 
 cuantGen op z (x:xs) t = t x `op` cuantGen op z xs t
@@ -703,9 +703,21 @@ ghci> cuantGen (*) 1 [3,2,2] id                 Output: 12
 ghci> cuantGen (+) 0 [3,2,2] factorial          Output: 10
 -}
 
+{-
+Recordamos el ejercicio 4:
+a) paratodo’ :: [a] -> (a -> Bool) -> Bool, dada una lista xs de tipo [a] y un
+    predicado t :: a -> Bool, determina si todos los elementos de xs satisfacen el predicado t.
+b) existe’ :: [a] -> (a -> Bool) -> Bool, dada una lista xs de tipo [a] y un
+    predicado t :: a -> Bool, determina si alg ́un elemento de xs satisface el predicado t.
+c) sumatoria’ :: [a] -> (a -> Int) -> Int, dada una lista xs de tipo [a] y una  
+funcion t :: a -> Int (toma elementos de tipo a y devuelve enteros), calcula la
+    suma de los valores que resultan de la aplicaci ́on de t a los elementos de xs.
+d) productoria’ :: [a] -> (a -> Int) -> Int, dada una lista de xs de tipo [a]
+    y una funci ́on t :: a -> Int, calcula el producto de los valores que resultan de la
+    aplicacion de t a los elementos de xs.
+-}
+
 -- paraTodo'
-
-
 paraTodo''' :: [a] -> (a -> Bool) -> Bool
 paraTodo''' xs t = cuantGen (&&) True xs t
 x_igual_1 x = x==1
@@ -715,5 +727,13 @@ ghci> paraTodo''' [1,1,1,1,1] x_igual_1     Output: True
 ghci> paraTodo''' [1,1,1,1,3] x_igual_1     Output: False 
 -}
 
+--existe''
+existe'' :: [a] -> (a->Bool) -> Bool
+existe'' xs t = cuantGen (||) False xs t 
+{-
+Ejecucion:
+ghci> existe'' ["auto"]  contieneR          Output: False 
+ghci> existe'' ["auto","Barco"]  contieneR  Output: True
+-}
 
 
