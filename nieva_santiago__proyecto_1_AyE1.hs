@@ -1,4 +1,11 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use newtype instead of data" #-}
+{-# LANGUAGE MonoLocalBinds #-}
+{-# LANGUAGE UndecidableInstances #-}
 import GHC.Float (float2Int)
+import Data.List (nub, sort)
+import Distribution.Simple (Bound)
+import Data.Maybe (maybeToList)
 
 {-
     Nombre:   Santiago Emanuel
@@ -688,8 +695,99 @@ ghci> primIguales' [[1],[1],[1],[1,2]]      Output: [[1],[1],[1]]
 
 ------------------------------------------------------------------------------------------------
 
--- 12)
 
+
+-- [[INICIO :VistoEnClase]]  Visto en clase 04/09/2023
+
+-- [CtrCto] constructor de datos [CtrCto] del tipo de datos [Conjunto]
+-- CtrCto :: [a] -> Conjunto a
+data Conjunto a = CtrCto [a] 
+
+pert::Eq a => a -> Conjunto a -> Bool
+pert _ (CtrCto []) = False
+pert x (CtrCto (e:es)) = x == e || pert x (CtrCto es)
+
+incluido :: Eq a => Conjunto a -> Conjunto a -> Bool
+incluido (CtrCto s1) (CtrCto s2) = paraTodo''' s1 (\x -> pert x (CtrCto s2))
+
+{-
+Este código define una instancia de la clase Eq para el tipo de datos Conjunto a. 
+La clase Eq define operaciones de igualdad y desigualdad para tipos de datos en Haskell. 
+La instancia Eq a => Eq (Conjunto a) significa que para cualquier tipo a que tenga una 
+instancia de Eq, el tipo Conjunto a también tendrá una instancia de Eq.
+
+La instancia define dos operadores: (==) y (/=). 
+El operador (==) toma dos valores del tipo Conjunto a y devuelve un valor booleano 
+que indica si los dos valores son iguales.
+
+El operador (/=) toma dos valores del tipo Conjunto a y devuelve un valor booleano 
+que indica si los dos valores son diferentes.
+-}
+instance Eq a => Eq (Conjunto a) where
+    (==) :: Eq a => Conjunto a -> Conjunto a -> Bool
+    a==b = a `incluido` b && b `incluido` a 
+    (/=) :: Eq a => Conjunto a -> Conjunto a -> Bool
+    a/=b = not(a `incluido` b && b `incluido` a)
+
+
+-- al definir la instancia de la clase Show al tipo de dato Conjunto a , puedo asi tambien definir su comportamiento
+instance Show a => Show (Conjunto a) where
+    show :: Show a => Conjunto a -> String
+    show (CtrCto xs) = "Conjunto " ++ show xs
+
+   -- Mi objetivo sera crear Las operaciones como : Union, Intersec, Resta, e investigar como podria funcionar el complemento
+class Operaciones a where 
+    --defino operacion "Union"
+    u :: (Eq a, Show a) => Conjunto a -> Conjunto a -> Conjunto a
+
+
+{-
+En esta definición, estoy usando una restricción de clase (Eq a, Show a) 
+para especificar que la instancia de la clase Operaciones se aplica a cualquier tipo a que tenga instancias de las clases Eq y Show. 
+Despues proporciono una implementación genérica para la función u que funciona para cualquier tipo a.
+
+Como llegue a esto?
+-------------------
+
+Me parecia demasiado tedioso tener que definir una instancia de Operaciones por cada tipo de dato (que derive Show y Eq):
+
+class Operaciones a where 
+    u :: (Eq a, Show a) => Conjunto a -> Conjunto a -> Conjunto a
+
+
+instance Operaciones Int where
+    u :: (Eq Int, Show Int) => Conjunto Int -> Conjunto Int -> Conjunto Int
+    CtrCto xs `u` CtrCto ys = CtrCto ({-sort-} ( nub xs ++ ys )) -- Al llamar a sort los resultados se mostraran de menor a mayor
+
+
+instance Operaciones [Char] where 
+    u :: (Eq [Char], Show [Char]) => Conjunto [Char] -> Conjunto [Char] -> Conjunto [Char]
+    CtrCto xs `u` CtrCto ys = CtrCto(nub xs++ys)
+-}
+instance (Eq a, Show a) => Operaciones a where
+    u :: (Eq a, Show a, Eq a, Show a) => Conjunto a -> Conjunto a -> Conjunto a
+    CtrCto xs `u` CtrCto ys = CtrCto (nub (xs ++ ys))
+
+{-
+Ejecucion de prueba:
+ghci> CtrCto ([] :: [Int]) `u` CtrCto ([1,1,1,1,1,3,3,3,3,5,5,5,5,5,4,4,4,4,4,4,4,4]::[Int])
+Conjunto [1,3,5,4]
+
+ghci> CtrCto ([] :: [Char]) `u` CtrCto ("abcde"::[Char])
+Conjunto "abcde"
+
+ghci> CtrCto (['f','g'] :: [Char]) `u` CtrCto ("abcde"::[Char])
+Conjunto "fgabcde"
+-}
+
+
+--Fuentes para lograr esto: 
+    --Conceptos claves y explicaciones --> Clase de laboratorio (fecha: 04/09/2023) 
+    --Ver definiciones de tipos y el uso de instancias y clases --> Hoogle
+
+--[[FINAL :VistoEnClase / Curiosidad por lo visto en clase ]]
+
+-- 12)
 cuantGen :: (b -> b -> b) -> b -> [a] -> (a -> b) -> b
 cuantGen _ z [] _ = z 
 cuantGen op z (x:xs) t = t x `op` cuantGen op z xs t
@@ -735,5 +833,9 @@ Ejecucion:
 ghci> existe'' ["auto"]  contieneR          Output: False 
 ghci> existe'' ["auto","Barco"]  contieneR  Output: True
 -}
+
+
+{-TODO: Continuar ejercicios NO obligatorios-}
+
 
 
