@@ -739,7 +739,7 @@ instance Show a => Show (Conjunto a) where
 class Operaciones a where 
     --defino operacion "Union"
     u :: (Eq a, Show a) => Conjunto a -> Conjunto a -> Conjunto a
-
+    i :: (Eq a, Show a) => Conjunto a -> Conjunto a -> Conjunto a
 
 {-
 En esta definición, estoy usando una restricción de clase (Eq a, Show a) 
@@ -767,6 +767,8 @@ instance Operaciones [Char] where
 instance (Eq a, Show a) => Operaciones a where
     u :: (Eq a, Show a, Eq a, Show a) => Conjunto a -> Conjunto a -> Conjunto a
     CtrCto xs `u` CtrCto ys = CtrCto (nub (xs ++ ys))
+    i :: (Eq a, Show a, Eq a, Show a) =>Conjunto a -> Conjunto a -> Conjunto a
+    CtrCto xs `i` CtrCto ys = CtrCto (nub ((( (filter (\x-> pert x (CtrCto ys)) xs)) ++  ( (filter (\y-> pert y (CtrCto xs)) ys)))))
 
 {-
 Ejecucion de prueba:
@@ -778,6 +780,13 @@ Conjunto "abcde"
 
 ghci> CtrCto (['f','g'] :: [Char]) `u` CtrCto ("abcde"::[Char])
 Conjunto "fgabcde"
+
+
+ghci> CtrCto ("ABCDE"::String) `i` CtrCto ("BAE"::String)
+Conjunto "ABE"
+
+ghci> CtrCto ([3,3,3,3,3,3,3,3,7,8,9,10] :: [Int]) `i` CtrCto ([1,1,1,1,1,3,3,3,3,9,9,9,9,9,9,9,9,9,9,5,5,5,5,5,4,4,4,4,4,4,4,4]::[Int])
+Conjunto [3,9]
 -}
 
 
