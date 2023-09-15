@@ -36,6 +36,7 @@ un valor del tipo Carrera.
 
 -- a)
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Use camelCase" #-}
 {-# HLINT ignore "Avoid lambda using `infix`" #-}
 {-# HLINT ignore "Evaluate" #-}
@@ -214,13 +215,9 @@ ghci> contar_futbolistas lista_de_futbolistas  Delantera
 
 --e) 
 
-
-
 esFutbolistaYcoincideZona  :: Deportista ->Zona -> Bool
 esFutbolistaYcoincideZona (Futbolista z _ _ _ ) zona = True && (z == zona)
 esFutbolistaYcoincideZona _ _ = False   
-
-
 
 contar_futbolistas' ::[Deportista] -> Zona -> Int
 contar_futbolistas' xs z = length(  filter (\x -> esFutbolistaYcoincideZona x z) xs)
@@ -236,3 +233,69 @@ ghci> lista_de_futbolistas
 ghci> contar_futbolistas' lista_de_futbolistas  Delantera  
 2 
 -}
+---------------------------------------------------------------------------------------------------
+
+-- Definicion de clases
+sonidoNatural :: NotaBasica' -> Int
+sonidoNatural DO = 0
+sonidoNatural RE = 2
+sonidoNatural MI = 4
+sonidoNatural FA = 5
+sonidoNatural SOL = 7
+sonidoNatural LA = 9
+sonidoNatural SI = 11
+
+--b)
+data Alteracion =  BEMOL|NATURAL|SOSTENIDO deriving (Eq)
+
+--c)
+data NotaMusical = Nota NotaBasica' Alteracion 
+
+--d)
+sonidoCromatico :: NotaMusical ->Int
+sonidoCromatico (Nota n NATURAL)    = sonidoNatural n 
+sonidoCromatico (Nota n BEMOL)      = sonidoNatural n - 1
+sonidoCromatico (Nota n SOSTENIDO)  = sonidoNatural n + 1 
+{-
+ghci> sonidoCromatico (Nota DO SOSTENIDO )
+1     
+ghci> sonidoCromatico (Nota SI BEMOL)     
+10
+-}
+
+-- e)
+instance Eq NotaMusical where
+    (==) :: NotaMusical -> NotaMusical -> Bool
+    (==) a b = sonidoCromatico a == sonidoCromatico b
+    (/=) :: NotaMusical -> NotaMusical -> Bool
+    (/=) a b = not(sonidoCromatico a == sonidoCromatico b)
+
+{-
+ghci> (Nota DO BEMOL) == (Nota DO SOSTENIDO)
+False
+ghci> (Nota SI BEMOL) == (Nota DO SOSTENIDO)
+False 
+ghci> (Nota FA BEMOL) == (Nota MI NATURAL )  
+True
+-}
+
+--f)
+
+instance Ord NotaMusical where
+    (<=) :: NotaMusical -> NotaMusical -> Bool
+    (<=) a b = sonidoCromatico a <= sonidoCromatico b
+
+
+{-
+ghci> (Nota FA BEMOL) == (Nota MI NATURAL )
+True  
+ghci> (Nota SI BEMOL) == (Nota DO SOSTENIDO)
+False 
+ghci> (Nota SI BEMOL) <= (Nota DO SOSTENIDO)
+False 
+ghci> (Nota SI BEMOL) >= (Nota DO SOSTENIDO)
+True
+-}
+-------------------------------------------------------------------------------------
+
+-- Tipos enumerados con polimorfismo
