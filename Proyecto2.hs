@@ -450,3 +450,19 @@ ghci> la_busca "Santiago" l1
 Just "3512326564"
 -}
 
+-- 6)
+
+la_borra :: Eq a => a -> ListaAsoc a b -> ListaAsoc a b 
+la_borra _ Vacia = Vacia
+la_borra sk (Nodo k v r) | sk /= k = Nodo k v (la_borra sk r)
+                         | sk == k = la_borra sk r
+{-
+ghci> let l1= la_agregar guia1 "Santiago" "3512326564"
+ghci> l2 = la_borra "Santiago" l1
+ghci> l2
+Nodo "Juan" "3213687123" (Nodo "Jose" "289472389" Vacia)
+ghci> l3 = la_borra "Jose" l2
+ghci> l3
+Nodo "Juan" "3213687123" Vacia
+ghci> l3 = la_borra "Jose" Vacio
+-}
