@@ -36,6 +36,7 @@ un valor del tipo Carrera.
 
 -- a)
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant bracket" #-}
 import GHC.Windows (errCodeToIOError)
 
 {-# HLINT ignore "Use camelCase" #-}
@@ -397,3 +398,55 @@ la_concat (Nodo a b r) lista2= Nodo a b (la_concat r lista2)
 ghci> la_concat guia1 guia2
 Nodo "Juan" "3213687123" (Nodo "Jose" "289472389" (Nodo "Maria" "12312312" Vacia))
 -}
+
+    --3)
+
+{-
+3) la_agregar :: Eq a => ListaAsoc a b -> a -> b -> ListaAsoc a b, que
+agrega un nodo a la lista de asociaciones si la clave no est´a en la lista, o actualiza
+el valor si la clave ya se encontraba
+-}
+
+--[a] es la clave y [b] el valor
+la_agregar ::Eq a => ListaAsoc a b -> a -> b ->ListaAsoc a b 
+la_agregar Vacia nk nv = Nodo nk nv Vacia
+la_agregar (Nodo k v rlista) sk nv | (sk /= k) = Nodo k v (la_agregar rlista sk nv)
+                                   | (sk == k) = Nodo sk nv rlista
+{-
+ghci> la_agregar guia1 "Santiago" "3512326564"
+Nodo "Juan" "3213687123" (Nodo "Jose" "289472389" (Nodo "Santiago" "3512326564" Vacia))
+ghci>
+-}
+
+    --4)
+
+la_pares::ListaAsoc a b ->[(a,b)]
+la_pares Vacia = []
+la_pares (Nodo k v r) = (k,v):la_pares r
+{-
+ghci> let l1= la_agregar guia1 "Santiago" "3512326564"
+ghci> l1
+Nodo "Juan" "3213687123" (Nodo "Jose" "289472389" (Nodo "Santiago" "3512326564" Vacia))
+ghci> la_pares l1
+[("Juan","3213687123"),("Jose","289472389"),("Santiago","3512326564")]
+ghci>
+-}
+
+-- 5)
+la_buscaAux :: Eq a => a -> ListaAsoc a b -> Maybe (ListaAsoc a b)
+la_buscaAux _ Vacia = Nothing
+la_buscaAux sk (Nodo k v r) | (sk /= k) = la_buscaAux sk r
+                         | (sk==k)   = Just (Nodo k v Vacia)
+
+la_busca :: Eq a => a -> ListaAsoc a b -> Maybe b
+la_busca sk lista = case la_buscaAux sk lista of
+    Nothing             -> Nothing
+    Just (Nodo k v r)   -> Just v
+{-
+ghci> let l1= la_agregar guia1 "Santiago" "3512326564"
+ghci> la_busca "Santiag" l1
+Nothing
+ghci> la_busca "Santiago" l1
+Just "3512326564"
+-}
+
