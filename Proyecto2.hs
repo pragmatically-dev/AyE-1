@@ -36,10 +36,12 @@ un valor del tipo Carrera.
 
 -- a)
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+import GHC.Windows (errCodeToIOError)
 
 {-# HLINT ignore "Use camelCase" #-}
 {-# HLINT ignore "Avoid lambda using `infix`" #-}
 {-# HLINT ignore "Evaluate" #-}
+{-# HLINT ignore "Use foldr" #-}
 
 
 data Carrera = Matematica|Fisica|Computacion|Astronomia 
@@ -299,3 +301,99 @@ True
 -------------------------------------------------------------------------------------
 
 -- Tipos enumerados con polimorfismo
+primerElemento :: [a] -> Maybe a 
+primerElemento [] = Nothing
+primerElemento (x:_) = Just x
+{-
+ghci> primerElemento [5,6]
+Just 5
+ghci> primerElemento []     
+Nothing
+-}
+
+
+-------------------------------------------------------------------------------------
+
+--Tipos recursivos
+
+data Cola = VaciaC | E Deportista Cola deriving (Show,Eq)
+
+
+--a) 
+--  1)
+ {-
+    Idea de funcionamiento:
+    let queue = E Ajedrecista (E (Velocista 100) VaciaC)
+    - en esta cola, el primero que entro fue el ajedrecista y el ultimo fue el velocista
+    por lo que para implementar la funcion atender deberemos ignorar el primer deportista y devolver el resto de la cola
+ -}
+
+atender':: Cola -> Maybe Cola
+atender' VaciaC = Nothing
+atender' (E deportista cola) = Just cola
+
+{-
+ghci> let queue = E (Ajedrecista) (E (Velocista 100) VaciaC )
+ghci> atender queue 
+Just (E (Velocista 100) VaciaC)
+ghci>
+-}
+
+--2)
+encolar :: Deportista -> Cola -> Cola
+encolar deportista VaciaC = E deportista VaciaC
+encolar deportista (E deportista' cola) = E deportista' (encolar deportista cola) 
+{-
+ghci> let q1 = encolar (Ajedrecista ) VaciaC 
+ghci> encolar (Velocista 150) q1
+E Ajedrecista (E (Velocista 150) VaciaC)
+-}
+
+--3)
+busca :: Cola -> Zona -> Maybe Deportista
+busca VaciaC _ = Nothing
+busca (E (Futbolista z a b c) cola) zona | zona /= z = busca (E (Futbolista z a b c) cola) zona
+                                         | otherwise = Just (Futbolista z a b c)
+busca (E _ cola) zona = busca cola zona
+{-
+ghci> let deportistas = encolar (Futbolista Arco 11 Derecha 175) ((encolar (Futbolista Arco 10 Izquierda 190) ( encolar (Ajedrecista ) VaciaC)) )
+ghci> busca deportistas Arco 
+Just (Futbolista Arco 10 Izquierda 190)
+-}
+
+-- b) El tipo String funciona de manera similar a Cola
+
+--8)
+data ListaAsoc key value = Vacia | Nodo key value (ListaAsoc key value) deriving Show
+
+type Diccionario = ListaAsoc String String
+type Padron      = ListaAsoc Int    String
+
+--a)
+type GuiaTelefonica = Diccionario
+
+guia1 :: GuiaTelefonica
+guia1 = Nodo "Juan" "3213687123" (Nodo "Jose" "289472389" Vacia)
+
+guia2::GuiaTelefonica
+guia2 = Nodo "Maria" "12312312" Vacia
+--b)
+
+    --1)
+
+la_long :: ListaAsoc a b -> Int
+la_long Vacia           = 0
+la_long (Nodo _ _ r)    = 1 + la_long r  
+{-
+ghci> la_long guia1 
+2
+-}
+
+    --2)
+la_concat :: ListaAsoc a b -> ListaAsoc a b -> ListaAsoc a b 
+la_concat Vacia l = l
+la_concat (Nodo a b r) lista2= Nodo a b (la_concat r lista2)
+{-
+ghci> la_concat guia1 guia2
+Nodo "Juan" "3213687123" (Nodo "Jose" "289472389" (Nodo "Maria" "12312312" Vacia))
+-}
