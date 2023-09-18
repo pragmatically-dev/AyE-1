@@ -461,7 +461,9 @@ ghci> l3 = la_borra "Jose" Vacio
 type RIzquierda a = Arbol a
 type RDerecha   a = RIzquierda a
 
-data Arbol datos = Hoja | Rama (RIzquierda datos) datos (RDerecha datos) deriving (Show)
+data Arbol dato = Hoja 
+                | Rama (RIzquierda dato) dato (RDerecha dato)     
+            deriving (Eq,Show)
 
 type Prefijos = Arbol String
 
@@ -476,6 +478,8 @@ cant    =  Rama cantar  "t"    canto
 cantar  =  Rama Hoja    "ar"   Hoja
 canto   =  Rama Hoja    "o"    Hoja
 
+
+-- a)
 a_long :: Arbol a -> Int
 a_long Hoja         = 0
 a_long (Rama left _ right) = 1 + (a_long left) + (a_long right)
@@ -485,3 +489,5 @@ Rama (Rama (Rama Hoja "rio" Hoja) "a" (Rama Hoja "s" Hoja)) "can" (Rama (Rama Ho
 ghci> a_long can
 7   
 -}
+
+
