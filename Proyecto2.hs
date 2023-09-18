@@ -491,3 +491,14 @@ ghci> a_long can
 -}
 
 
+esHoja::Arbol a -> Bool
+esHoja Hoja = True
+esHoja _ = False
+
+contarHojas :: Arbol a -> Int
+contarHojas Hoja = 0
+contarHojas (Rama izq _ der) | (esHoja izq && esHoja der ) = (1 + (contarHojas izq)+ (1 + contarHojas der))
+                             | otherwise = 0 + contarHojas izq + contarHojas der 
+                             
+                             
+                         
