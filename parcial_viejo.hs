@@ -14,3 +14,12 @@ leGana Papel Papel   = False
 leGana Tijera Tijera = False
 leGana Tijera Papel  = True
 leGana Tijera Piedra = False
+
+{-
+ghci> leGana Piedra Papel 
+False
+ghci> leGana Papel Tijera 
+False
+ghci> leGana Papel Piedra 
+True
+-}
