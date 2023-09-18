@@ -44,3 +44,31 @@ p2 = (Mano "X"     Piedra)
 ghci> ganador p1 p2
 Just "Santiago"
 -}
+
+
+
+-- Ejercicio 2 
+
+esMisma :: Forma -> Forma -> Bool
+esMisma Piedra Piedra = True
+esMisma Papel Papel  = True
+esMisma Tijera Tijera = True
+esMisma _ _ =False
+
+quien_jugo ::Forma -> [Jugador] -> [Nombre]
+quien_jugo _ [] = []
+quien_jugo fb ((Mano n f):xs) | esMisma fb f = n:quien_jugo fb xs
+                              | otherwise    = quien_jugo fb xs 
+
+{-
+ghci> let players =  p1:p2:[]   
+ghci> quien_jugo Piedra players 
+["X"] 
+ghci> quien_jugo Papel players  
+["Santiago"]
+ghci>
+-}
+ 
+
+ -- Ejercicio 3
+
