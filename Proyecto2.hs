@@ -35,14 +35,7 @@ un valor del tipo Carrera.
 -}
 
 -- a)
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant bracket" #-}
-import GHC.Windows (errCodeToIOError)
 
-{-# HLINT ignore "Use camelCase" #-}
-{-# HLINT ignore "Avoid lambda using `infix`" #-}
-{-# HLINT ignore "Evaluate" #-}
-{-# HLINT ignore "Use foldr" #-}
 
 
 data Carrera = Matematica|Fisica|Computacion|Astronomia 
@@ -322,16 +315,10 @@ data Cola = VaciaC | E Deportista Cola deriving (Show,Eq)
 
 --a) 
 --  1)
- {-
-    Idea de funcionamiento:
-    let queue = E Ajedrecista (E (Velocista 100) VaciaC)
-    - en esta cola, el primero que entro fue el ajedrecista y el ultimo fue el velocista
-    por lo que para implementar la funcion atender deberemos ignorar el primer deportista y devolver el resto de la cola
- -}
 
-atender':: Cola -> Maybe Cola
-atender' VaciaC = Nothing
-atender' (E deportista cola) = Just cola
+atender:: Cola -> Maybe Cola
+atender VaciaC = Nothing
+atender (E deportista cola) = Just cola
 
 {-
 ghci> let queue = E (Ajedrecista) (E (Velocista 100) VaciaC )
@@ -465,4 +452,36 @@ ghci> l3 = la_borra "Jose" l2
 ghci> l3
 Nodo "Juan" "3213687123" Vacia
 ghci> l3 = la_borra "Jose" Vacio
+-}
+
+--EJERCICIOS EXTRAS
+
+--9)
+
+type RIzquierda a = Arbol a
+type RDerecha   a = RIzquierda a
+
+data Arbol datos = Hoja | Rama (RIzquierda datos) datos (RDerecha datos) deriving (Show)
+
+type Prefijos = Arbol String
+
+--Raiz
+can     =  Rama cana    "can"  cant
+--Rama Izquierda
+cana    =  Rama canario "a"    canas
+canario =  Rama Hoja    "rio"  Hoja
+canas   =  Rama Hoja    "s"    Hoja
+--Rama Derecha
+cant    =  Rama cantar  "t"    canto
+cantar  =  Rama Hoja    "ar"   Hoja
+canto   =  Rama Hoja    "o"    Hoja
+
+a_long :: Arbol a -> Int
+a_long Hoja         = 0
+a_long (Rama left _ right) = 1 + (a_long left) + (a_long right)
+{-
+ghci> can
+Rama (Rama (Rama Hoja "rio" Hoja) "a" (Rama Hoja "s" Hoja)) "can" (Rama (Rama Hoja "ar" Hoja) "t" (Rama Hoja "o" Hoja))
+ghci> a_long can
+7   
 -}
