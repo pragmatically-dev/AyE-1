@@ -75,5 +75,6 @@ ghci>
 data NotaMusical = Do|Re|Mi|Fa|Sol|La|Si
 
 data Figura =Negra|Corchea
+
 data Melodia = Entonar NotaMusical Figura (Melodia)
 
